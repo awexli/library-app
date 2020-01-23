@@ -1,3 +1,6 @@
+const library = {1: ['George', 'Lucas', 'Read']};
+let id = 1;
+
 class Book {
     constructor(id, title, author, status) {
         this.id = id;
@@ -7,20 +10,16 @@ class Book {
     }
 
     addBookToLibrary() {
-        const newBook = [this.id, this.title, this.author, this.status];
-        myLibrary.push(newBook)
-        console.log(myLibrary)
+        const newBook1 = [this.title, this.author, this.status]
+        library[this.id] = newBook1;
     }
 
     render() {
-        renderCard(myLibrary.length-1);
+        renderMap(this.id, library[this.id])
     }
 }
 
-const myLibrary = [[1,'george','lucas','read']]
 const addBook = document.getElementById('submit-book');
-let id = 2;
-
 addBook.addEventListener('click', () => {
     newBook();
 });
@@ -37,7 +36,7 @@ function newBook() {
     if (validTitle && validAuthor) {
         const newBook = new Book
         (   
-            id++,
+            ++id,
             addTitle.value, 
             addAuthor.value, 
             statusValue
@@ -61,22 +60,25 @@ function isValidString(input) {
 }
 
 function initialRender() {
-    for(let i = 0; i < myLibrary.length; i++) {
-        renderCard(i);
+    for (const [key, value] of Object.entries(library)) {
+        renderMap(key, value);
     }
 }
 
 // could also be used to refresh
-function renderCard(index) {
+function renderMap(id, index) {
     const newCard = document.createElement('div')
-    const renderTitle = document.createElement('P')
-    const renderAuthor = document.createElement('P')
-    const renderStatus = document.createElement('P')
+    const bookId = document.createElement('p')
+    const renderTitle = document.createElement('p')
+    const renderAuthor = document.createElement('p')
+    const renderStatus = document.createElement('p')
     const delButton = document.createElement('button');
-    renderTitle.innerText = myLibrary[index][1]
-    renderAuthor.innerText = myLibrary[index][2]
-    renderStatus.innerText = myLibrary[index][3]
+    bookId.innerText = id;
+    renderTitle.innerText = index[0];
+    renderAuthor.innerText = index[1];
+    renderStatus.innerText = index[2];
     delButton.innerText = "Remove"
+    newCard.appendChild(bookId);
     newCard.appendChild(renderTitle)
     newCard.appendChild(renderAuthor)
     newCard.appendChild(renderStatus)
