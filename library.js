@@ -1,16 +1,13 @@
-const myLibrary = [['george','lucas','read']]
-const addBook = document.getElementById('submit-book');
-
 class Book {
-    constructor(title, author, status) {
-        // TODO
+    constructor(id, title, author, status) {
+        this.id = id;
         this.title = title
         this.author = author
         this.status = status
     }
 
     addBookToLibrary() {
-        const newBook = [this.title, this.author, this.status];
+        const newBook = [this.id, this.title, this.author, this.status];
         myLibrary.push(newBook)
         console.log(myLibrary)
     }
@@ -19,6 +16,10 @@ class Book {
         renderCard(myLibrary.length-1);
     }
 }
+
+const myLibrary = [[1,'george','lucas','read']]
+const addBook = document.getElementById('submit-book');
+let id = 2;
 
 addBook.addEventListener('click', () => {
     newBook();
@@ -35,7 +36,9 @@ function newBook() {
 
     if (validTitle && validAuthor) {
         const newBook = new Book
-        (   addTitle.value, 
+        (   
+            id++,
+            addTitle.value, 
             addAuthor.value, 
             statusValue
         );
@@ -69,12 +72,15 @@ function renderCard(index) {
     const renderTitle = document.createElement('P')
     const renderAuthor = document.createElement('P')
     const renderStatus = document.createElement('P')
-    renderTitle.innerText = myLibrary[index][0]
-    renderAuthor.innerText = myLibrary[index][1]
-    renderStatus.innerText = myLibrary[index][2]
+    const delButton = document.createElement('button');
+    renderTitle.innerText = myLibrary[index][1]
+    renderAuthor.innerText = myLibrary[index][2]
+    renderStatus.innerText = myLibrary[index][3]
+    delButton.innerText = "Remove"
     newCard.appendChild(renderTitle)
     newCard.appendChild(renderAuthor)
     newCard.appendChild(renderStatus)
+    newCard.appendChild(delButton);
     document.querySelector('.card').appendChild(newCard)
 }
 
