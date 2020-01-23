@@ -15,7 +15,7 @@ class Book {
     }
 
     render() {
-        renderMap(this.id, library[this.id])
+        renderCard(this.id, library[this.id])
     }
 }
 
@@ -59,14 +59,14 @@ function isValidString(input) {
     return input.value.match(alphaExp)
 }
 
-function initialRender() {
+function renderAll() {
     for (const [key, value] of Object.entries(library)) {
-        renderMap(key, value);
+        renderCard(key, value);
     }
 }
 
 // could also be used to refresh
-function renderMap(id, index) {
+function renderCard(id, index) {
     const newCard = document.createElement('div')
     const bookId = document.createElement('p')
     const renderTitle = document.createElement('p')
@@ -87,5 +87,5 @@ function renderMap(id, index) {
 }
 
 window.onload = function() {
-    initialRender();
+    renderAll();
 }
