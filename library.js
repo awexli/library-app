@@ -1,4 +1,5 @@
 const myLibrary = [['george','lucas','read']]
+const addBook = document.getElementById('submit-book');
 
 class Book {
     constructor(title, author, status) {
@@ -11,6 +12,7 @@ class Book {
     addBookToLibrary() {
         const newBook = [this.title, this.author, this.status];
         myLibrary.push(newBook)
+        console.log(myLibrary)
     }
 
     render() {
@@ -18,13 +20,42 @@ class Book {
     }
 }
 
-const addBook = document.getElementById('add')
 addBook.addEventListener('click', () => {
-    const newBook = new Book('a', 'b', 'c');
-    newBook.addBookToLibrary();
-    newBook.render();
-    console.log(myLibrary)
-})
+    newBook();
+});
+
+function newBook() {
+    const addTitle = document.getElementById('title');
+    const addAuthor = document.getElementById('author');
+    const addStatus = document.getElementById('status');
+
+    const validTitle = isValidString(addTitle);
+    const validAuthor = isValidString(addAuthor);
+    const statusValue = checkStatus(addStatus);
+
+    if (validTitle && validAuthor) {
+        const newBook = new Book
+        (   addTitle.value, 
+            addAuthor.value, 
+            statusValue
+        );
+        newBook.addBookToLibrary();
+        newBook.render();
+    }
+    
+    addTitle.value = "";
+    addAuthor.value = "";
+    addStatus.checked = false;
+}
+
+function checkStatus(checkbox) {
+    return checkbox.checked ? "Read" : "To Read";
+}
+
+function isValidString(input) {
+    const alphaExp = /^[a-zA-Z]+$/;
+    return input.value.match(alphaExp)
+}
 
 function initialRender() {
     for(let i = 0; i < myLibrary.length; i++) {
@@ -32,6 +63,7 @@ function initialRender() {
     }
 }
 
+// could also be used to refresh
 function renderCard(index) {
     const newCard = document.createElement('div')
     const renderTitle = document.createElement('P')

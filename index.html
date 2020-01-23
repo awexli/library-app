@@ -10,7 +10,7 @@
 <body>
     <div class="card">
     </div>
-    <button id="add" type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#myModal">addbook</button>
+    <button type="button" class="btn btn-info btn-md" data-toggle="modal" data-target="#myModal">addbook</button>
     <!-- Modal -->
     <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
@@ -28,9 +28,9 @@
                 <label for="author">Author:</label>
                 <input type="text" id="author" placeholder="Enter author" name="author">
                 <label>
-                  <input type="checkbox" name="read"> Read
+                  <input id="status" type="checkbox" name="read"> Read
                 </label>
-                <button type="button" data-dismiss="modal">Submit</button>
+                <button id="submit-book" type="button" data-dismiss="modal">Submit</button>
               </form>
         </div>
         <div class="modal-footer">
