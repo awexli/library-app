@@ -1,5 +1,27 @@
-.card {
-    border: 1px solid red;
-    display: flex;
-    justify-content: space-between;
+#card-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: small;
+}
+
+#card-table td, #card-table th {
+    padding-left: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Striped Tables */
+#card-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#card-table tr:hover {
+    background-color: #ddd;
+}
+
+#card-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
 }

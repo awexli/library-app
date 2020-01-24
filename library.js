@@ -23,9 +23,9 @@ class Book {
 function listen() {
     let currCard, currId;
     document.addEventListener('click', (e) => {
-        const card = e.path[1];
+        const card = e.path[2];
         const bookId = parseInt(card.id);
-    
+        
         if (e.target.id == 'submit-book') newBook();
 
         if (e.target.className == 'delete') deleteEntry(card, bookId);
@@ -73,7 +73,7 @@ function deleteEntry(card, bookId) {
 
 /**
  * @param {number} bookId
- * @param {HTMLDivElement} card
+ * @param {HTMLTableRowElement} card
  * @param {boolean} isConfirm
  * @return {function} isConfirm ? confirmEdit() : editModal();
  */
@@ -145,10 +145,11 @@ function renderAll() {
 }
 
 function renderCard(id, index) {
-    const newCard = document.createElement('div')
-    const renderTitle = document.createElement('p')
-    const renderAuthor = document.createElement('p')
-    const renderStatus = document.createElement('p')
+    const newCard = document.createElement('tr');
+    const renderTitle = document.createElement('td');
+    const renderAuthor = document.createElement('td');
+    const renderStatus = document.createElement('td');
+    const wrapButtons = document.createElement('td');
     const delButton = document.createElement('button');
     const editCard = document.createElement('button');
 
@@ -169,16 +170,18 @@ function renderCard(id, index) {
     editCard.setAttribute('data-toggle', 'modal');
     editCard.setAttribute('data-target', '#editBookModal');
 
+    wrapButtons.appendChild(editCard);
+    wrapButtons.appendChild(delButton);
+
     newCard.className = "card";
     newCard.id = id;
     
-    newCard.appendChild(renderTitle)
-    newCard.appendChild(renderAuthor)
-    newCard.appendChild(renderStatus)
-    newCard.appendChild(editCard);
-    newCard.appendChild(delButton);
+    newCard.appendChild(renderTitle);
+    newCard.appendChild(renderAuthor);
+    newCard.appendChild(renderStatus);
+    newCard.appendChild(wrapButtons);
 
-    document.querySelector('#cards').appendChild(newCard)
+    document.querySelector('#cards').appendChild(newCard);
 }
 
 window.onload = function() {
