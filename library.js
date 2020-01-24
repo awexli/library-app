@@ -21,20 +21,22 @@ class Book {
 }
 
 function listen() {
-    let currCard;
-    let currId;
+    let currCard, currId;
     document.addEventListener('click', (e) => {
         const card = e.path[1];
         const bookId = parseInt(card.id);
     
         if (e.target.id == 'submit-book') newBook();
+
         if (e.target.className == 'delete') deleteEntry(card, bookId);
+
         if (e.target.className == 'edit-card') {
-            currCard = card;
             currId = bookId;
-            editModal(currId);
+            currCard = card;
+            enterEditModal(currId, currCard, false)
         }
-        if (e.target.id == 'confirm-edit') editEntry(currId, currCard);
+
+        if (e.target.id == 'confirm-edit') enterEditModal(currId, currCard, true);
     })
 } 
 
@@ -69,43 +71,49 @@ function deleteEntry(card, bookId) {
     card.remove();
 }
 
-function editModal(bookId) {
-    const bookData = library.get(bookId);
+/**
+ * @param {number} bookId
+ * @param {HTMLDivElement} card
+ * @param {boolean} isConfirm
+ * @return {function} isConfirm ? confirmEdit() : editModal();
+ */
+function enterEditModal(bookId, card, isConfirm) {
     const editTitle = document.getElementById('title-edit');
     const editAuthor = document.getElementById('author-edit');
     const editStatus = document.getElementById('status-edit');
 
-    editTitle.placeholder = bookData[0];
-    editAuthor.placeholder = bookData[1];
+    const editModal = () => {
+        const bookDataArray = library.get(bookId);
+        editTitle.placeholder = bookDataArray[0];
+        editAuthor.placeholder = bookDataArray[1];
 
-    if (bookData[2] == 'Read') {
-        editStatus.checked = true;
-    } else {
-        editStatus.checked = false;
+        if (bookDataArray[2] == 'Read') {
+            editStatus.checked = true;
+        } else {
+            editStatus.checked = false;
+        }
     }
-}
 
-function editEntry(bookId, card) {
-    const editTitle = document.getElementById('title-edit');
-    const editAuthor = document.getElementById('author-edit');
-    const editStatus = document.getElementById('status-edit');
+    const confirmEdit = () => {
+        const validTitle = isValidString(editTitle);
+        const validAuthor = isValidString(editAuthor);
+        const statusValue = checkStatus(editStatus);
 
-    const validTitle = isValidString(editTitle);
-    const validAuthor = isValidString(editAuthor);
-    const statusValue = checkStatus(editStatus);
-
-    if (validTitle && validAuthor) {
-        library.set(bookId,[
-            editTitle.value,
-            editAuthor.value,
-            statusValue
-        ]);
-    }
+        if (validTitle && validAuthor) {
+            library.set(bookId,[
+                editTitle.value,
+                editAuthor.value,
+                statusValue
+            ]);
+        }
+        
+        updateCard(bookId, card);
     
-    updateCard(bookId, card);
+        editTitle.value = "";
+        editAuthor.value = "";
+    }
 
-    editTitle.value = "";
-    editAuthor.value = "";
+    return isConfirm ? confirmEdit() : editModal();
 }
 
 function updateCard(bookId, card) {
