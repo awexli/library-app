@@ -25,7 +25,7 @@ function listen() {
     document.addEventListener('click', (e) => {
         const card = e.path[2];
         const bookId = parseInt(card.id);
-        
+
         if (e.target.id == 'submit-book') newBook();
 
         if (e.target.className == 'delete') deleteEntry(card, bookId);
@@ -170,6 +170,7 @@ function renderCard(id, index) {
     editCard.setAttribute('data-toggle', 'modal');
     editCard.setAttribute('data-target', '#editBookModal');
 
+    wrapButtons.className = 'wrap-buttons';
     wrapButtons.appendChild(editCard);
     wrapButtons.appendChild(delButton);
 

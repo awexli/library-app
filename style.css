@@ -18,10 +18,34 @@
     background-color: #ddd;
 }
 
+/* Table Header */
 #card-table th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
-    background-color: #4CAF50;
+    background-color: #F4F1EB;
+    color: #372212;
+}
+
+.wrap-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn {
+    color: #372212;
+    background-color: #F4F1EB;
+    border: 1px solid #372212;
+}
+
+.btn-info.active.focus, .btn-info.active:focus, .btn-info.active:hover, .btn-info:active.focus, .btn-info:active:focus, .btn-info:active:hover, .open>.dropdown-toggle.btn-info.focus, .open>.dropdown-toggle.btn-info:focus, .open>.dropdown-toggle.btn-info:hover {
+    background-color: #372212;
+    border: 1px solid #372212;
     color: white;
+}
+
+.btn-info.focus, .btn-info:focus {
+    color: #372212;
+    background-color: #F4F1EB;
+    border-color: none;
 }
