@@ -88,7 +88,7 @@ function editModal(bookId) {
 function editEntry(bookId, card) {
     const editTitle = document.getElementById('title-edit');
     const editAuthor = document.getElementById('author-edit');
-    const editStatus = document.getElementById('status');
+    const editStatus = document.getElementById('status-edit');
 
     const validTitle = isValidString(editTitle);
     const validAuthor = isValidString(editAuthor);
@@ -101,9 +101,14 @@ function editEntry(bookId, card) {
             statusValue
         ]);
     }
+    
+    updateCard(bookId, card);
 
-    // rerender entry
-    // could also be used to refresh
+    editTitle.value = "";
+    editAuthor.value = "";
+}
+
+function updateCard(bookId, card) {
     const bookData = library.get(bookId);
     if (card.hasChildNodes()) {
         const children = card.childNodes;
@@ -111,10 +116,6 @@ function editEntry(bookId, card) {
             children[i].innerText = bookData[i];
         }
     }
-    
-    editTitle.value = "";
-    editAuthor.value = "";
-    statusValue.checked = false;
 }
 
 function checkStatus(checkbox) {
