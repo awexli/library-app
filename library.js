@@ -61,6 +61,8 @@ function newBook() {
         newBook.render();
     }
     
+    // display error message
+    
     addTitle.value = "";
     addAuthor.value = "";
     addStatus.checked = false;
@@ -106,7 +108,9 @@ function enterEditModal(bookId, card, isConfirm) {
                 statusValue
             ]);
         }
-        
+
+        // display error message
+
         updateCard(bookId, card);
     
         editTitle.value = "";
