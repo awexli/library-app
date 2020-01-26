@@ -107,9 +107,10 @@ function enterEditModal(bookId, card, isConfirm) {
                 editAuthor.value,
                 statusValue
             ]);
+        } else {
+            // display error message
+            console.log('Did not update because not alphabet')
         }
-
-        // display error message
 
         updateCard(bookId, card);
     
@@ -123,9 +124,8 @@ function enterEditModal(bookId, card, isConfirm) {
 function updateCard(bookId, card) {
     const bookData = library.get(bookId);
     if (card.hasChildNodes()) {
-        const children = card.childNodes;
-        for (let i = 0; i < 3; i++) {
-            children[i].innerText = bookData[i];
+        for (let i = 0; i < card.childElementCount-1; i++) {
+            card.children[i].innerText = bookData[i];
         }
     }
 }
@@ -149,44 +149,41 @@ function renderAll() {
 }
 
 function renderCard(id, index) {
+    const cards = document.getElementById('cards');
     const newCard = document.createElement('tr');
-    const renderTitle = document.createElement('td');
-    const renderAuthor = document.createElement('td');
-    const renderStatus = document.createElement('td');
-    const wrapButtons = document.createElement('td');
-    const delButton = document.createElement('button');
-    const editCard = document.createElement('button');
-
-    renderTitle.className ='title';
-    renderTitle.innerText = index[0];
-
-    renderAuthor.className = 'author';
-    renderAuthor.innerText = index[1];
-
-    renderStatus.className = 'status';
-    renderStatus.innerText = index[2];
-
-    delButton.innerText = "Remove";
-    delButton.className = "delete";
-
-    editCard.innerText = "Edit";
-    editCard.className = "edit-card";
-    editCard.setAttribute('data-toggle', 'modal');
-    editCard.setAttribute('data-target', '#editBookModal');
-
-    wrapButtons.className = 'wrap-buttons';
-    wrapButtons.appendChild(editCard);
-    wrapButtons.appendChild(delButton);
-
     newCard.className = "card";
     newCard.id = id;
-    
-    newCard.appendChild(renderTitle);
-    newCard.appendChild(renderAuthor);
-    newCard.appendChild(renderStatus);
-    newCard.appendChild(wrapButtons);
+    let cardTemplate = `
+    <td class="title">${index[0]}</td>
+    <td class="author">${index[1]}</td>
+    <td class="status">${index[2]}</td>
+    <td class="wrap-buttons">
+        <button class="edit-card" data-toggle="modal" data-target="#editBookModal">Edit</button>
+        <button class="delete">Remove</button>
+    </td>`;
 
-    document.querySelector('#cards').appendChild(newCard);
+    // This is for cleaning the nodelist of a card's childrenNodes
+    // prob uncessary cause updateCard() is using HTMLElements to grab
+    // the correct children
+
+    // otherwise card.childrenNodes will include empty #texts
+    const trimTemplate = () => {
+        let cleanTemplate = []
+
+        cardTemplate = cardTemplate.split('\n');
+        for (let i = 0; i < cardTemplate.length; i++) {
+            let element = cardTemplate[i];
+            if (element.replace(/\s/g,"") != "") {
+                cleanTemplate.push(cardTemplate[i].trim());
+            } 
+        }
+
+        return cleanTemplate.join('');
+    }
+
+    newCard.innerHTML = trimTemplate();
+
+    cards.appendChild(newCard);
 }
 
 window.onload = function() {
