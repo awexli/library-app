@@ -37,6 +37,10 @@ function listen() {
         }
 
         if (e.target.id == 'confirm-edit') enterEditModal(currId, currCard, true);
+
+        if (e.target.id == 'sort-title') sortTable(0);
+        if (e.target.id == 'sort-author') sortTable(1);
+        if (e.target.id == 'sort-status') sortTable(2);
     })
 } 
 
@@ -122,10 +126,23 @@ function enterEditModal(bookId, card, isConfirm) {
     return isConfirm ? confirmEdit() : editModal();
 }
 
+/**
+ * Updates the innerText of title, author, and status in a card-row
+ * @param {number} bookId
+ * @param {HTMLTableRowElement} card
+ * @return {void}
+ */
 function updateCard(bookId, card) {
     const bookData = library.get(bookId);
-    if (card.hasChildNodes()) {
-        for (let i = 0; i < card.childElementCount-1; i++) {
+    if (card.childElementCount > 0) {
+        /**
+         * mainElements include:
+         * <td class="title"></td>
+         * <td class="author"></td>
+         * <td class="status"></td>
+         */
+        const mainElements = card.childElementCount - 1;
+        for (let i = 0; i < mainElements; i++) {
             card.children[i].innerText = bookData[i];
         }
     }
@@ -164,10 +181,10 @@ function renderCard(id, index) {
     `;
 
     /**
-     * This is for cleaning the nodelist of a card's childrenNodes
+     * This is for cleaning the nodelist of a card's childNodes
      * Prob uncessary cause updateCard() is using HTMLCollection to grab
      * the correct children.
-     * Otherwise card.childrenNodes will include empty #texts nodes
+     * Otherwise card.childNodes will include empty #texts nodes
      */
     const trimTemplate = () => {
         const cleanTemplate = []
@@ -182,9 +199,63 @@ function renderCard(id, index) {
     }
 
     cards.innerHTML = cards.innerHTML + cardTemplate;
-    console.log(cards.innerHTML)
     console.log(library)
 }
+
+function sortTable(n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("card-table");
+    switching = true;
+    //Set the sorting direction to ascending:
+    dir = "asc"; 
+    /*Make a loop that will continue until
+    no switching has been done:*/
+    while (switching) {
+      //start by saying: no switching is done:
+      switching = false;
+      rows = table.rows;
+      /*Loop through all table rows (except the
+      first, which contains table headers):*/
+      for (i = 1; i < (rows.length - 1); i++) {
+        //start by saying there should be no switching:
+        shouldSwitch = false;
+        /*Get the two elements you want to compare,
+        one from current row and one from the next:*/
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+        /*check if the two rows should switch place,
+        based on the direction, asc or desc:*/
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch= true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            //if so, mark as a switch and break the loop:
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        /*If a switch has been marked, make the switch
+        and mark that a switch has been done:*/
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        //Each time a switch is done, increase this count by 1:
+        switchcount ++;      
+      } else {
+        /*If no switching has been done AND the direction is "asc",
+        set the direction to "desc" and run the while loop again.*/
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
 
 window.onload = function() {
     this.renderAll();
