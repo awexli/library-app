@@ -59,9 +59,10 @@ function newBook() {
         );
         newBook.addBookToLibrary();
         newBook.render();
+    } else {
+        // display error message
+        console.log('Did not update because not alphabet')
     }
-    
-    // display error message
     
     addTitle.value = "";
     addAuthor.value = "";
@@ -150,40 +151,39 @@ function renderAll() {
 
 function renderCard(id, index) {
     const cards = document.getElementById('cards');
-    const newCard = document.createElement('tr');
-    newCard.className = "card";
-    newCard.id = id;
     let cardTemplate = `
-    <td class="title">${index[0]}</td>
-    <td class="author">${index[1]}</td>
-    <td class="status">${index[2]}</td>
-    <td class="wrap-buttons">
-        <button class="edit-card" data-toggle="modal" data-target="#editBookModal">Edit</button>
-        <button class="delete">Remove</button>
-    </td>`;
+    <tr id="${id}" class="card-row">
+        <td class="title">${index[0]}</td>
+        <td class="author">${index[1]}</td>
+        <td class="status">${index[2]}</td>
+        <td class="wrap-buttons">
+            <button class="edit-card" data-toggle="modal" data-target="#editBookModal">Edit</button>
+            <button class="delete">Remove</button>
+        </td>
+    </tr>
+    `;
 
-    // This is for cleaning the nodelist of a card's childrenNodes
-    // prob uncessary cause updateCard() is using HTMLElements to grab
-    // the correct children
-
-    // otherwise card.childrenNodes will include empty #texts
+    /**
+     * This is for cleaning the nodelist of a card's childrenNodes
+     * Prob uncessary cause updateCard() is using HTMLCollection to grab
+     * the correct children.
+     * Otherwise card.childrenNodes will include empty #texts nodes
+     */
     const trimTemplate = () => {
-        let cleanTemplate = []
+        const cleanTemplate = []
 
-        cardTemplate = cardTemplate.split('\n');
-        for (let i = 0; i < cardTemplate.length; i++) {
-            let element = cardTemplate[i];
+        cardTemplate.split('\n').map(element => {
             if (element.replace(/\s/g,"") != "") {
-                cleanTemplate.push(cardTemplate[i].trim());
+                cleanTemplate.push(element.trim());
             } 
-        }
+        });
 
         return cleanTemplate.join('');
     }
 
-    newCard.innerHTML = trimTemplate();
-
-    cards.appendChild(newCard);
+    cards.innerHTML = cards.innerHTML + cardTemplate;
+    console.log(cards.innerHTML)
+    console.log(library)
 }
 
 window.onload = function() {
