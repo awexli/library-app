@@ -1,5 +1,6 @@
-let lib = {1:['george', 'lucas', 'read']}
+let lib = {1:['Dune', 'Frank Herbert', 'Read']}
 let id = 1;
+let hasLocal = false;
 
 class Book {
     constructor(id, title, author, status) {
@@ -10,20 +11,26 @@ class Book {
     }
 
     addBookToLibrary() {
-        var localLib = JSON.parse(localStorage.getItem('lib'))
         const newBook1 = [this.title, this.author, this.status]
-        localLib[this.id] = newBook1;
-        localStorage.setItem('lib', JSON.stringify(localLib));
+
+        if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
+
+        lib[this.id] = newBook1;
+
+        localStorage.setItem('lib', JSON.stringify(lib));
+
+        console.log(lib)
     }
 
     render() {
-        var localLib = JSON.parse(localStorage.getItem('lib'))
-        renderCard(this.id, localLib[this.id])
+        if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
+
+        renderCard(this.id, lib[this.id]);
     }
 }
 
 function listen() {
-    let currCard, currId;
+    var currCard, currId;
     document.addEventListener('click', (e) => {
         const card = e.path[2];
         const bookId = parseInt(card.id);
@@ -57,8 +64,9 @@ function newBook() {
     const validAuthor = isValidString(addAuthor);
     const statusValue = checkStatus(addStatus);
 
+    if (hasLocal) id = localStorage.getItem('id');
+
     if (validTitle && validAuthor) {
-        id = localStorage.getItem('id')
         const newBook = new Book
         (   
             ++id,
@@ -80,11 +88,13 @@ function newBook() {
 }
 
 function deleteEntry(card, bookId) {
-    var localLib = JSON.parse(localStorage.getItem('lib'))
-    delete localLib[bookId];
-    card.remove();
-    localStorage.setItem('lib', JSON.stringify(localLib));
+    if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
+    delete lib[bookId];
+
+    card.remove();
+
+    localStorage.setItem('lib', JSON.stringify(lib));
 }
 
 /**
@@ -98,10 +108,14 @@ function enterEditModal(bookId, card, isConfirm) {
     const editAuthor = document.getElementById('author-edit');
     const editStatus = document.getElementById('status-edit');
 
-    var localLib = JSON.parse(localStorage.getItem('lib'))
+    if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
+    // Correct Placeholders
     const editModal = () => {
-        const bookDataArray = localLib[bookId];
+        var bookDataArray;
+
+        bookDataArray = lib[bookId];
+
         editTitle.placeholder = bookDataArray[0];
         editAuthor.placeholder = bookDataArray[1];
 
@@ -118,12 +132,15 @@ function enterEditModal(bookId, card, isConfirm) {
         const statusValue = checkStatus(editStatus);
 
         if (validTitle && validAuthor) {
-            localLib[bookId] = [
+
+            lib[bookId] = [
                 editTitle.value,
                 editAuthor.value,
                 statusValue
             ];
-            localStorage.setItem('lib', JSON.stringify(localLib));
+
+            localStorage.setItem('lib', JSON.stringify(lib));
+
             updateCard(bookId, card);
         } else {
             // display error message
@@ -144,14 +161,16 @@ function enterEditModal(bookId, card, isConfirm) {
  * @return {void}
  */
 function updateCard(bookId, card) {
-    var localData = JSON.parse(localStorage.getItem('lib'));
-    var bookData = localData[bookId]
+    if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
+        
+    var bookData = lib[bookId]
 
     for (let i = 0; i < bookData.length; i++) {
         let stringEntry = `{ "update":"${bookData[i]}" }`;
         let entry = JSON.parse(stringEntry);
         card.children[i].innerText = entry.update;
     }
+    
 }
 
 function checkStatus(checkbox) {
@@ -159,16 +178,18 @@ function checkStatus(checkbox) {
 }
 
 function isValidString(input) {
-    const alphaExp = /^[a-zA-Z]+$/;
+    const alphaExp = /^[\sa-zA-Z]+$/;
     return input.value.match(alphaExp)
 }
 
-function renderAll() {
-    var localData = JSON.parse(localStorage.getItem('lib'))
-    
-    const id = Object.keys(localData);
-    const index = Object.values(localData);
-    const length = Object.keys(localData).length
+function renderAll(hasLocal) {
+    var id, index, length;
+
+    if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
+        
+    id = Object.keys(lib);
+    index = Object.values(lib);
+    length = Object.keys(lib).length;
 
     for (let i = 0; i < length; i++) {
         renderCard(id[i], index[i]);
@@ -191,6 +212,25 @@ function renderCard(key, value){
     cards.innerHTML = cards.innerHTML + cardTemplate;
 }
 
+window.onload = function() {
+    this.listen();
+    if (storageAvailable('localStorage')) {
+        console.log('Yippee! We can use localStorage awesomeness')
+        hasLocal = true;
+        if (!localStorage.getItem('lib')) {
+            localStorage.setItem('lib', JSON.stringify(lib));
+            localStorage.setItem('id', id);
+            this.renderAll(hasLocal);
+        } else {
+            this.renderAll(hasLocal);
+        }
+    } else {
+        console.log('Too bad, no localStorage for us')
+        this.renderAll(hasLocal);
+    }
+}
+
+// w3school
 function sortTable(n) {
     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
     table = document.getElementById("card-table");
@@ -227,7 +267,7 @@ function sortTable(n) {
         }
     }
 }
-
+// MDN  web docs
 function storageAvailable(type) {
     var storage;
     try {
@@ -250,21 +290,5 @@ function storageAvailable(type) {
             e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
             // acknowledge QuotaExceededError only if there's something already stored
             (storage && storage.length !== 0);
-    }
-}
-
-window.onload = function() {
-    this.listen();
-    if (storageAvailable('localStorage')) {
-        console.log('Yippee! We can use localStorage awesomeness')
-        if (!localStorage.getItem('lib')) {
-            localStorage.setItem('lib', JSON.stringify(lib));
-            localStorage.setItem('id', id);
-            this.renderAll();
-        } else {
-            this.renderAll();
-        }
-    } else {
-        console.log('Too bad, no localStorage for us')
     }
 }
