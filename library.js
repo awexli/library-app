@@ -110,14 +110,13 @@ function enterEditModal(bookId, card, isConfirm) {
 
     if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
-    // Correct Placeholders
     const editModal = () => {
         var bookDataArray;
 
         bookDataArray = lib[bookId];
 
-        editTitle.placeholder = bookDataArray[0];
-        editAuthor.placeholder = bookDataArray[1];
+        editTitle.value = bookDataArray[0];
+        editAuthor.value = bookDataArray[1];
 
         if (bookDataArray[2] == 'Read') {
             editStatus.checked = true;
