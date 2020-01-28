@@ -16,6 +16,11 @@ h1 {
     background-color: #F4F1EA;
 }
 
+.table-head a {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .wrap-buttons {
     display: flex;
     flex-direction: column;
