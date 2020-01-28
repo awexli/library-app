@@ -1,5 +1,4 @@
-const library = new Map();
-library.set(1,['George', 'Lucas', 'Read'])
+let lib = {1:['george', 'lucas', 'read']}
 let id = 1;
 
 class Book {
@@ -11,12 +10,15 @@ class Book {
     }
 
     addBookToLibrary() {
+        var localLib = JSON.parse(localStorage.getItem('lib'))
         const newBook1 = [this.title, this.author, this.status]
-        library.set(this.id, newBook1);
+        localLib[this.id] = newBook1;
+        localStorage.setItem('lib', JSON.stringify(localLib));
     }
 
     render() {
-        renderCard(this.id, library.get(this.id))
+        var localLib = JSON.parse(localStorage.getItem('lib'))
+        renderCard(this.id, localLib[this.id])
     }
 }
 
@@ -39,7 +41,9 @@ function listen() {
         if (e.target.id == 'confirm-edit') enterEditModal(currId, currCard, true);
 
         if (e.target.id == 'sort-title') sortTable(0);
+
         if (e.target.id == 'sort-author') sortTable(1);
+        
         if (e.target.id == 'sort-status') sortTable(2);
     })
 } 
@@ -54,6 +58,7 @@ function newBook() {
     const statusValue = checkStatus(addStatus);
 
     if (validTitle && validAuthor) {
+        id = localStorage.getItem('id')
         const newBook = new Book
         (   
             ++id,
@@ -61,6 +66,7 @@ function newBook() {
             addAuthor.value, 
             statusValue
         );
+        localStorage.setItem('id', id);
         newBook.addBookToLibrary();
         newBook.render();
     } else {
@@ -74,8 +80,11 @@ function newBook() {
 }
 
 function deleteEntry(card, bookId) {
-    library.delete(bookId)
+    var localLib = JSON.parse(localStorage.getItem('lib'))
+    delete localLib[bookId];
     card.remove();
+    localStorage.setItem('lib', JSON.stringify(localLib));
+
 }
 
 /**
@@ -89,8 +98,10 @@ function enterEditModal(bookId, card, isConfirm) {
     const editAuthor = document.getElementById('author-edit');
     const editStatus = document.getElementById('status-edit');
 
+    var localLib = JSON.parse(localStorage.getItem('lib'))
+
     const editModal = () => {
-        const bookDataArray = library.get(bookId);
+        const bookDataArray = localLib[bookId];
         editTitle.placeholder = bookDataArray[0];
         editAuthor.placeholder = bookDataArray[1];
 
@@ -107,18 +118,18 @@ function enterEditModal(bookId, card, isConfirm) {
         const statusValue = checkStatus(editStatus);
 
         if (validTitle && validAuthor) {
-            library.set(bookId,[
+            localLib[bookId] = [
                 editTitle.value,
                 editAuthor.value,
                 statusValue
-            ]);
+            ];
+            localStorage.setItem('lib', JSON.stringify(localLib));
+            updateCard(bookId, card);
         } else {
             // display error message
             console.log('Did not update because not alphabet')
         }
 
-        updateCard(bookId, card);
-    
         editTitle.value = "";
         editAuthor.value = "";
     }
@@ -133,18 +144,13 @@ function enterEditModal(bookId, card, isConfirm) {
  * @return {void}
  */
 function updateCard(bookId, card) {
-    const bookData = library.get(bookId);
-    if (card.childElementCount > 0) {
-        /**
-         * mainElements include:
-         * <td class="title"></td>
-         * <td class="author"></td>
-         * <td class="status"></td>
-         */
-        const mainElements = card.childElementCount - 1;
-        for (let i = 0; i < mainElements; i++) {
-            card.children[i].innerText = bookData[i];
-        }
+    var localData = JSON.parse(localStorage.getItem('lib'));
+    var bookData = localData[bookId]
+
+    for (let i = 0; i < bookData.length; i++) {
+        let stringEntry = `{ "update":"${bookData[i]}" }`;
+        let entry = JSON.parse(stringEntry);
+        card.children[i].innerText = entry.update;
     }
 }
 
@@ -158,106 +164,107 @@ function isValidString(input) {
 }
 
 function renderAll() {
-    const id = library.keys();
-    const index = library.values();
+    var localData = JSON.parse(localStorage.getItem('lib'))
+    
+    const id = Object.keys(localData);
+    const index = Object.values(localData);
+    const length = Object.keys(localData).length
 
-    for (let i = 0; i < library.size; i++) {
-        renderCard(id.next().value, index.next().value);
+    for (let i = 0; i < length; i++) {
+        renderCard(id[i], index[i]);
     }
 }
 
-function renderCard(id, index) {
+function renderCard(key, value){
     const cards = document.getElementById('cards');
     let cardTemplate = `
-    <tr id="${id}" class="card-row">
-        <td class="title">${index[0]}</td>
-        <td class="author">${index[1]}</td>
-        <td class="status">${index[2]}</td>
+    <tr id="${key}" class="card-row">
+        <td class="title">${value[0]}</td>
+        <td class="author">${value[1]}</td>
+        <td class="status">${value[2]}</td>
         <td class="wrap-buttons">
             <button class="edit-card" data-toggle="modal" data-target="#editBookModal">Edit</button>
             <button class="delete">Remove</button>
         </td>
     </tr>
     `;
-
-    /**
-     * This is for cleaning the nodelist of a card's childNodes
-     * Prob uncessary cause updateCard() is using HTMLCollection to grab
-     * the correct children.
-     * Otherwise card.childNodes will include empty #texts nodes
-     */
-    const trimTemplate = () => {
-        const cleanTemplate = []
-
-        cardTemplate.split('\n').map(element => {
-            if (element.replace(/\s/g,"") != "") {
-                cleanTemplate.push(element.trim());
-            } 
-        });
-
-        return cleanTemplate.join('');
-    }
-
     cards.innerHTML = cards.innerHTML + cardTemplate;
-    console.log(library)
 }
 
 function sortTable(n) {
     var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
     table = document.getElementById("card-table");
     switching = true;
-    //Set the sorting direction to ascending:
     dir = "asc"; 
-    /*Make a loop that will continue until
-    no switching has been done:*/
     while (switching) {
-      //start by saying: no switching is done:
-      switching = false;
-      rows = table.rows;
-      /*Loop through all table rows (except the
-      first, which contains table headers):*/
-      for (i = 1; i < (rows.length - 1); i++) {
-        //start by saying there should be no switching:
-        shouldSwitch = false;
-        /*Get the two elements you want to compare,
-        one from current row and one from the next:*/
-        x = rows[i].getElementsByTagName("TD")[n];
-        y = rows[i + 1].getElementsByTagName("TD")[n];
-        /*check if the two rows should switch place,
-        based on the direction, asc or desc:*/
+        switching = false;
+        rows = table.rows;
+    for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
         if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch= true;
-            break;
-          }
+            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                shouldSwitch= true;
+                break;
+            }
         } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            //if so, mark as a switch and break the loop:
-            shouldSwitch = true;
-            break;
-          }
+            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                shouldSwitch = true;
+                break;
+            }
         }
-      }
-      if (shouldSwitch) {
-        /*If a switch has been marked, make the switch
-        and mark that a switch has been done:*/
+    }
+    if (shouldSwitch) {
         rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
         switching = true;
-        //Each time a switch is done, increase this count by 1:
         switchcount ++;      
-      } else {
-        /*If no switching has been done AND the direction is "asc",
-        set the direction to "desc" and run the while loop again.*/
-        if (switchcount == 0 && dir == "asc") {
-          dir = "desc";
-          switching = true;
+    } else {
+            if (switchcount == 0 && dir == "asc") {
+            dir = "desc";
+            switching = true;
+            }
         }
-      }
     }
-  }
+}
+
+function storageAvailable(type) {
+    var storage;
+    try {
+        storage = window[type];
+        var x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            (storage && storage.length !== 0);
+    }
+}
 
 window.onload = function() {
-    this.renderAll();
     this.listen();
+    if (storageAvailable('localStorage')) {
+        console.log('Yippee! We can use localStorage awesomeness')
+        if (!localStorage.getItem('lib')) {
+            localStorage.setItem('lib', JSON.stringify(lib));
+            localStorage.setItem('id', id);
+            this.renderAll();
+        } else {
+            this.renderAll();
+        }
+    } else {
+        console.log('Too bad, no localStorage for us')
+    }
 }
