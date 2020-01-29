@@ -32,8 +32,15 @@ class Book {
 function listen() {
     var currCard, currId;
     document.addEventListener('click', (e) => {
-        const card = e.target.parentElement.parentElement;
-        const bookId = parseInt(card.id);
+        var card;
+        var bookId;
+
+        try {
+            card = e.target.parentElement.parentElement;
+            bookId = parseInt(card.id)
+          } catch(err) {
+            console.log(err)
+        }
 
         if (e.target.id == 'submit-book') newBook();
 
@@ -60,9 +67,12 @@ function newBook() {
     const addAuthor = document.getElementById('author');
     const addStatus = document.getElementById('status');
 
-    const validTitle = isValidString(addTitle);
-    const validAuthor = isValidString(addAuthor);
-    const statusValue = checkStatus(addStatus);
+    const validTitle = isValidString(addTitle.value);
+    const validAuthor = isValidString(addAuthor.value);
+    const statusValue = checkStatus(addStatus.value);
+
+    const added = document.getElementById('added');
+    const err = document.getElementById('error-add')
 
     if (hasLocal) id = localStorage.getItem('id');
 
@@ -77,14 +87,40 @@ function newBook() {
         localStorage.setItem('id', id);
         newBook.addBookToLibrary();
         newBook.render();
+
+        formFeedback(err, added, true);
+
     } else {
         // display error message
         console.log('Did not update because not alphabet')
+
+        formFeedback(err, added, false);
     }
     
     addTitle.value = "";
     addAuthor.value = "";
     addStatus.checked = false;
+}
+
+function formFeedback(err, valid, isAdded) {
+    if (!isAdded) {
+        const tempErr = err;
+        err = valid;
+        valid = tempErr;
+    }
+
+    if (err.style.display == 'block') {
+        err.style.display = 'none';
+    } 
+
+    if (valid.style.display == 'none') {
+        err.style.display = 'none';
+    } 
+
+    setTimeout(function(){
+        valid.style.display = 'none';
+    }, 2500)
+    
 }
 
 function deleteEntry(card, bookId) {
@@ -98,6 +134,7 @@ function deleteEntry(card, bookId) {
 }
 
 /**
+ * Updates either the modal values or library data
  * @param {number} bookId
  * @param {HTMLTableRowElement} card
  * @param {boolean} isConfirm
@@ -107,6 +144,11 @@ function enterEditModal(bookId, card, isConfirm) {
     const editTitle = document.getElementById('title-edit');
     const editAuthor = document.getElementById('author-edit');
     const editStatus = document.getElementById('status-edit');
+    
+    const update = document.getElementById('updated');
+    const err = document.getElementById('error-confirm')
+
+    var isValid = false;
 
     if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
@@ -123,14 +165,25 @@ function enterEditModal(bookId, card, isConfirm) {
         } else {
             editStatus.checked = false;
         }
+
+        const dismissModal = document.getElementById('confirm-edit');
+        
+        setInterval(() => {
+            if (!isValidString(editTitle.value) || !isValidString(editAuthor.value)) {
+                dismissModal.removeAttribute('data-dismiss');
+            } else {
+                dismissModal.setAttribute('data-dismiss', 'modal');
+            }
+        }, 400)
     }
 
     const confirmEdit = () => {
-        const validTitle = isValidString(editTitle);
-        const validAuthor = isValidString(editAuthor);
-        const statusValue = checkStatus(editStatus);
+        const validTitle = isValidString(editTitle.value);
+        const validAuthor = isValidString(editAuthor.value);
+        const statusValue = checkStatus(editStatus.value);
 
         if (validTitle && validAuthor) {
+            isValid = true;
 
             lib[bookId] = [
                 editTitle.value,
@@ -139,15 +192,18 @@ function enterEditModal(bookId, card, isConfirm) {
             ];
 
             localStorage.setItem('lib', JSON.stringify(lib));
-
+            formFeedback(err, update, true);
             updateCard(bookId, card);
         } else {
             // display error message
             console.log('Did not update because not alphabet')
+            formFeedback(err, update, false);
         }
 
-        editTitle.value = "";
-        editAuthor.value = "";
+        if (isValid) {
+            editTitle.value = "";
+            editAuthor.value = "";
+        }
     }
 
     return isConfirm ? confirmEdit() : editModal();
@@ -178,7 +234,7 @@ function checkStatus(checkbox) {
 
 function isValidString(input) {
     const alphaExp = /^[\sa-zA-Z]+$/;
-    return input.value.match(alphaExp)
+    return alphaExp.test(input);
 }
 
 function renderAll(hasLocal) {
