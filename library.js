@@ -31,7 +31,7 @@ class Book {
 
 function listen() {
     var currCard, currId;
-    document.addEventListener('click', (e) => {
+    document.addEventListener('touchstart click', (e) => {
         const card = e.path[2];
         const bookId = parseInt(card.id);
 
