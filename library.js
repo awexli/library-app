@@ -32,7 +32,7 @@ class Book {
 function listen() {
     var currCard, currId;
     document.addEventListener('click', (e) => {
-        const card = e.path[2];
+        const card = e.target.parentElement.parentElement;
         const bookId = parseInt(card.id);
 
         if (e.target.id == 'submit-book') newBook();
