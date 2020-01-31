@@ -1,6 +1,7 @@
 let lib = {1:['Dune', 'Frank Herbert', 'Read']}
 let id = 1;
 let hasLocal = false;
+var validInputInterval;
 
 class Book {
     constructor(id, title, author, status) {
@@ -18,8 +19,6 @@ class Book {
         lib[this.id] = newBook1;
 
         localStorage.setItem('lib', JSON.stringify(lib));
-
-        console.log(lib)
     }
 
     render() {
@@ -34,17 +33,22 @@ function listen() {
     document.addEventListener('click', (e) => {
         var card;
         var bookId;
-
         try {
             card = e.target.parentElement.parentElement;
             bookId = parseInt(card.id)
           } catch(err) {
-            console.log(err)
+            console.log('hiccup!')
         }
 
-        if (e.target.id == 'submit-book') newBook();
+        if (e.target.className == 'add-button') {
+            currId = bookId;
+            currCard = card;
+            newBook(currId, false);
+        } 
 
-        if (e.target.className == 'delete') deleteEntry(card, bookId);
+        if (e.target.id == 'submit-book') {
+            newBook(currId, true);
+        } 
 
         if (e.target.className == 'edit-card') {
             currId = bookId;
@@ -52,75 +56,68 @@ function listen() {
             enterEditModal(currId, currCard, false)
         }
 
-        if (e.target.id == 'confirm-edit') enterEditModal(currId, currCard, true);
+        if (e.target.id == 'confirm-edit') {
+            enterEditModal(currId, currCard, true);
+        } 
+
+        if (e.target.className == 'delete') deleteEntry(card, bookId);
 
         if (e.target.id == 'sort-title') sortTable(0);
 
         if (e.target.id == 'sort-author') sortTable(1);
         
         if (e.target.id == 'sort-status') sortTable(2);
+
     })
 } 
 
-function newBook() {
+function newBook(id, isSubmit) {
     const addTitle = document.getElementById('title');
     const addAuthor = document.getElementById('author');
     const addStatus = document.getElementById('status');
 
-    const validTitle = isValidString(addTitle.value);
-    const validAuthor = isValidString(addAuthor.value);
-    const statusValue = checkStatus(addStatus.value);
-
-    const added = document.getElementById('added');
-    const err = document.getElementById('error-add')
+    var isValid = false;
 
     if (hasLocal) id = localStorage.getItem('id');
-
-    if (validTitle && validAuthor) {
-        const newBook = new Book
-        (   
-            ++id,
-            addTitle.value, 
-            addAuthor.value, 
-            statusValue
-        );
-        localStorage.setItem('id', id);
-        newBook.addBookToLibrary();
-        newBook.render();
-
-        formFeedback(err, added, true);
-
-    } else {
-        // display error message
-        console.log('Did not update because not alphabet')
-
-        formFeedback(err, added, false);
-    }
     
-    addTitle.value = "";
-    addAuthor.value = "";
-    addStatus.checked = false;
-}
-
-function formFeedback(err, valid, isAdded) {
-    if (!isAdded) {
-        const tempErr = err;
-        err = valid;
-        valid = tempErr;
+    const addingBook = () => {
+        const dismissModal = document.getElementById('submit-book');
+        inputFeedback(addTitle, addAuthor, dismissModal);
     }
 
-    if (err.style.display == 'block') {
-        err.style.display = 'none';
-    } 
+    const submitBook = () => {
+        const err = document.getElementById('error-add')
+        const validTitle = isValidString(addTitle.value);
+        const validAuthor = isValidString(addAuthor.value);
+        const statusValue = checkStatus(addStatus.value);
 
-    if (valid.style.display == 'none') {
-        err.style.display = 'none';
-    } 
-
-    setTimeout(function(){
-        valid.style.display = 'none';
-    }, 2500)
+        if (validTitle && validAuthor) {
+            isValid = true;
+            const newBook = new Book
+            (   
+                ++id,
+                addTitle.value, 
+                addAuthor.value, 
+                statusValue
+            );
+            localStorage.setItem('id', id);
+            newBook.addBookToLibrary();
+            newBook.render();
+        } else {
+            // display error message
+            console.log('Did not update because not alphabet')
+            err.style.display = 'block';
+        }
     
+        if (isValid) {
+            err.style.display = 'none';
+            addTitle.value = "";
+            addAuthor.value = "";
+            addStatus.checked = false;
+        }
+    }
+    
+    return isSubmit ? submitBook() : addingBook();
 }
 
 function deleteEntry(card, bookId) {
@@ -144,8 +141,6 @@ function enterEditModal(bookId, card, isConfirm) {
     const editTitle = document.getElementById('title-edit');
     const editAuthor = document.getElementById('author-edit');
     const editStatus = document.getElementById('status-edit');
-    
-    const update = document.getElementById('updated');
     const err = document.getElementById('error-confirm')
 
     var isValid = false;
@@ -153,9 +148,8 @@ function enterEditModal(bookId, card, isConfirm) {
     if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
     const editModal = () => {
-        var bookDataArray;
-
-        bookDataArray = lib[bookId];
+        const dismissModal = document.getElementById('confirm-edit');
+        var bookDataArray = lib[bookId];
 
         editTitle.value = bookDataArray[0];
         editAuthor.value = bookDataArray[1];
@@ -166,15 +160,7 @@ function enterEditModal(bookId, card, isConfirm) {
             editStatus.checked = false;
         }
 
-        const dismissModal = document.getElementById('confirm-edit');
-        
-        setInterval(() => {
-            if (!isValidString(editTitle.value) || !isValidString(editAuthor.value)) {
-                dismissModal.removeAttribute('data-dismiss');
-            } else {
-                dismissModal.setAttribute('data-dismiss', 'modal');
-            }
-        }, 400)
+        inputFeedback(editTitle, editAuthor, dismissModal);
     }
 
     const confirmEdit = () => {
@@ -192,21 +178,62 @@ function enterEditModal(bookId, card, isConfirm) {
             ];
 
             localStorage.setItem('lib', JSON.stringify(lib));
-            formFeedback(err, update, true);
             updateCard(bookId, card);
         } else {
-            // display error message
-            console.log('Did not update because not alphabet')
-            formFeedback(err, update, false);
+            // display error message (only allows alphabet and numbers for now)
+            err.style.display = 'block';
         }
 
         if (isValid) {
-            editTitle.value = "";
-            editAuthor.value = "";
+            err.style.display = 'none';
         }
     }
-
+    
     return isConfirm ? confirmEdit() : editModal();
+}
+
+function inputFeedback(title, author, modal) {
+    var modals = document.querySelectorAll('.modal');
+    validInputInterval = setInterval(() => {
+        if (!isValidString(title.value)) {
+            modal.removeAttribute('data-dismiss');
+            title.style.backgroundSize = "1rem";
+            title.style.borderColor = "red";
+        } 
+        
+        if (!isValidString(author.value)) {
+            modal.removeAttribute('data-dismiss');
+            author.style.backgroundSize = "1rem";
+            author.style.borderColor = "red";
+        } 
+        
+        if (isValidString(title.value)) {
+            title.style.backgroundSize = "0";
+            title.style.borderColor = "#CED4DA";
+        }
+
+        if (isValidString(author.value)) {
+            author.style.backgroundSize = "0";
+            author.style.borderColor = "#CED4DA";
+        }
+
+        if (isValidString(title.value) && isValidString(author.value)) {
+            modal.setAttribute('data-dismiss', 'modal');
+        }
+
+        // stops interval if modals are closed
+        modals.forEach(modal => {
+            if (modal.style.display == 'none') {
+                stopInputFeedBack();
+            }
+        })
+
+        console.log("running interval")
+    }, 400)
+}
+
+function stopInputFeedBack() {
+    clearInterval(validInputInterval);
 }
 
 /**
@@ -233,7 +260,7 @@ function checkStatus(checkbox) {
 }
 
 function isValidString(input) {
-    const alphaExp = /^[\sa-zA-Z]+$/;
+    const alphaExp = /^[\sa-zA-Z0-9]+$/;
     return alphaExp.test(input);
 }
 
