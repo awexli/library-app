@@ -109,6 +109,7 @@ function newBook(isSubmit) {
             localStorage.setItem('id', id);
             newBook.addBookToLibrary();
             newBook.render();
+            err.style.display = 'none';
             validEntry.style.display = 'block';
         } else {
             // display error message (only allows alphabet and numbers for now)
@@ -191,7 +192,8 @@ function enterEditModal(bookId, card, isConfirm) {
  */
 function inputFeedback(title, author, modal) {
     var validEntry = document.getElementById('valid-add');
-    var err = document.getElementById('error-confirm')
+    var errConfirm = document.getElementById('error-confirm')
+    var errAdd = document.getElementById('error-add');
     var modals = document.querySelectorAll('.modal');
 
     validInputInterval = setInterval(() => {
@@ -224,9 +226,12 @@ function inputFeedback(title, author, modal) {
         // stops interval if modals are closed
         modals.forEach(modal => {
             if (modal.style.display == 'none') {
-                stopInputFeedBack();
                 validEntry.style.display = 'none';
-                err.style.display = 'none';
+                errConfirm.style.display = 'none';
+                errAdd.style.display = 'none';
+                title.value = "";
+                author.value = "";
+                stopInputFeedBack();
             }
         })
 
