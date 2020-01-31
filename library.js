@@ -1,6 +1,6 @@
-let lib = {1:['Dune', 'Frank Herbert', 'Read']}
-let id = 1;
-let hasLocal = false;
+var lib = {1:['Dune', 'Frank Herbert', 'Read']}
+var id = 1;
+var hasLocal = false;
 var validInputInterval;
 
 class Book {
@@ -81,15 +81,15 @@ function newBook(id, isSubmit) {
     if (hasLocal) id = localStorage.getItem('id');
     
     const addingBook = () => {
-        const dismissModal = document.getElementById('submit-book');
-        inputFeedback(addTitle, addAuthor, dismissModal);
+        inputFeedback(addTitle, addAuthor, document.getElementById('confirm-edit'));
     }
 
     const submitBook = () => {
-        const err = document.getElementById('error-add')
+        const err = document.getElementById('error-add');
+        const validEntry = document.getElementById('valid-add');
         const validTitle = isValidString(addTitle.value);
         const validAuthor = isValidString(addAuthor.value);
-        const statusValue = checkStatus(addStatus.value);
+        const statusValue = checkStatus(addStatus);
 
         if (validTitle && validAuthor) {
             isValid = true;
@@ -103,14 +103,14 @@ function newBook(id, isSubmit) {
             localStorage.setItem('id', id);
             newBook.addBookToLibrary();
             newBook.render();
+            validEntry.style.display = 'block';
         } else {
-            // display error message
-            console.log('Did not update because not alphabet')
+            // display error message (only allows alphabet and numbers for now)
+            validEntry.style.display = 'none';
             err.style.display = 'block';
         }
     
         if (isValid) {
-            err.style.display = 'none';
             addTitle.value = "";
             addAuthor.value = "";
             addStatus.checked = false;
@@ -141,9 +141,7 @@ function enterEditModal(bookId, card, isConfirm) {
     const editTitle = document.getElementById('title-edit');
     const editAuthor = document.getElementById('author-edit');
     const editStatus = document.getElementById('status-edit');
-    const err = document.getElementById('error-confirm')
-
-    var isValid = false;
+    
 
     if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
@@ -166,11 +164,10 @@ function enterEditModal(bookId, card, isConfirm) {
     const confirmEdit = () => {
         const validTitle = isValidString(editTitle.value);
         const validAuthor = isValidString(editAuthor.value);
-        const statusValue = checkStatus(editStatus.value);
+        const statusValue = checkStatus(editStatus);
+        const err = document.getElementById('error-confirm')
 
         if (validTitle && validAuthor) {
-            isValid = true;
-
             lib[bookId] = [
                 editTitle.value,
                 editAuthor.value,
@@ -183,17 +180,16 @@ function enterEditModal(bookId, card, isConfirm) {
             // display error message (only allows alphabet and numbers for now)
             err.style.display = 'block';
         }
-
-        if (isValid) {
-            err.style.display = 'none';
-        }
     }
     
     return isConfirm ? confirmEdit() : editModal();
 }
 
 function inputFeedback(title, author, modal) {
+    var validEntry = document.getElementById('valid-add');
+    var err = document.getElementById('error-confirm')
     var modals = document.querySelectorAll('.modal');
+
     validInputInterval = setInterval(() => {
         if (!isValidString(title.value)) {
             modal.removeAttribute('data-dismiss');
@@ -225,6 +221,8 @@ function inputFeedback(title, author, modal) {
         modals.forEach(modal => {
             if (modal.style.display == 'none') {
                 stopInputFeedBack();
+                validEntry.style.display = 'none';
+                err.style.display = 'none';
             }
         })
 
