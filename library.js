@@ -43,11 +43,11 @@ function listen() {
         if (e.target.className == 'add-button') {
             currId = bookId;
             currCard = card;
-            newBook(currId, false);
+            newBook(false);
         } 
 
         if (e.target.id == 'submit-book') {
-            newBook(currId, true);
+            newBook(true);
         } 
 
         if (e.target.className == 'edit-card') {
@@ -71,7 +71,13 @@ function listen() {
     })
 } 
 
-function newBook(id, isSubmit) {
+/**
+ * Checks for valid inputs if addBookModal is entered
+ * Add's book to library if valid submission
+ * @param {boolean} isSubmit
+ * @return {function} isSubmit ? submitBook() : addingBook();
+ */
+function newBook(isSubmit) {
     const addTitle = document.getElementById('title');
     const addAuthor = document.getElementById('author');
     const addStatus = document.getElementById('status');
@@ -120,18 +126,9 @@ function newBook(id, isSubmit) {
     return isSubmit ? submitBook() : addingBook();
 }
 
-function deleteEntry(card, bookId) {
-    if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
-
-    delete lib[bookId];
-
-    card.remove();
-
-    localStorage.setItem('lib', JSON.stringify(lib));
-}
-
 /**
- * Updates either the modal values or library data
+ * Checks for valid inputs if editBookModal is entered
+ * Updates book in the library if valid submission
  * @param {number} bookId
  * @param {HTMLTableRowElement} card
  * @param {boolean} isConfirm
@@ -185,6 +182,13 @@ function enterEditModal(bookId, card, isConfirm) {
     return isConfirm ? confirmEdit() : editModal();
 }
 
+/**
+ * Continually checks if input is a valid
+ * @param {HTMLInputElement} title
+ * @param {HTMLInputElement} author
+ * @param {HTMLButtonElement} modal
+ * @return {void}
+ */
 function inputFeedback(title, author, modal) {
     var validEntry = document.getElementById('valid-add');
     var err = document.getElementById('error-confirm')
@@ -230,10 +234,6 @@ function inputFeedback(title, author, modal) {
     }, 400)
 }
 
-function stopInputFeedBack() {
-    clearInterval(validInputInterval);
-}
-
 /**
  * Updates the innerText of title, author, and status in a card-row
  * @param {number} bookId
@@ -251,15 +251,6 @@ function updateCard(bookId, card) {
         card.children[i].innerText = entry.update;
     }
     
-}
-
-function checkStatus(checkbox) {
-    return checkbox.checked ? "Read" : "To Read";
-}
-
-function isValidString(input) {
-    const alphaExp = /^[\sa-zA-Z0-9]+$/;
-    return alphaExp.test(input);
 }
 
 function renderAll(hasLocal) {
@@ -290,6 +281,33 @@ function renderCard(key, value){
     </tr>
     `;
     cards.innerHTML = cards.innerHTML + cardTemplate;
+}
+
+function deleteEntry(card, bookId) {
+    if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
+
+    delete lib[bookId];
+
+    card.remove();
+
+    localStorage.setItem('lib', JSON.stringify(lib));
+}
+
+function checkStatus(checkbox) {
+    return checkbox.checked ? "Read" : "To Read";
+}
+
+/**
+ * Checks for letters, numbers, and whitespace
+ * @return {void}
+ */
+function isValidString(input) {
+    const alphaExp = /^[\sa-zA-Z0-9]+$/;
+    return alphaExp.test(input);
+}
+
+function stopInputFeedBack() {
+    clearInterval(validInputInterval);
 }
 
 window.onload = function() {
