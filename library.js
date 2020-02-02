@@ -1,4 +1,4 @@
-var lib = {1:['Dune', 'Frank Herbert', 'Read']}
+var lib = {1:['Dune', 'Frank Herbert', 'Read']};
 var id = 1;
 var hasLocal = false;
 var validInputInterval;
@@ -6,13 +6,13 @@ var validInputInterval;
 class Book {
     constructor(id, title, author, status) {
         this.id = id;
-        this.title = title
-        this.author = author
-        this.status = status
+        this.title = title;
+        this.author = author;
+        this.status = status;
     }
 
     addBookToLibrary() {
-        const newBook1 = [this.title, this.author, this.status]
+        const newBook1 = [this.title, this.author, this.status];
 
         if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
 
@@ -35,9 +35,9 @@ function listen() {
         var bookId;
         try {
             card = e.target.parentElement.parentElement;
-            bookId = parseInt(card.id)
+            bookId = parseInt(card.id);
           } catch(err) {
-            console.log('hiccup!')
+            console.log('hiccup!');
         }
 
         if (e.target.className == 'add-button') {
@@ -53,7 +53,7 @@ function listen() {
         if (e.target.className == 'edit-card') {
             currId = bookId;
             currCard = card;
-            enterEditModal(currId, currCard, false)
+            enterEditModal(currId, currCard, false);
         }
 
         if (e.target.id == 'confirm-edit') {
@@ -68,7 +68,7 @@ function listen() {
         
         if (e.target.id == 'sort-status') sortTable(2);
 
-    })
+    });
 } 
 
 /**
@@ -88,7 +88,7 @@ function newBook(isSubmit) {
     
     const addingBook = () => {
         inputFeedback(addTitle, addAuthor, document.getElementById('confirm-edit'));
-    }
+    };
 
     const submitBook = () => {
         const err = document.getElementById('error-add');
@@ -122,7 +122,7 @@ function newBook(isSubmit) {
             addAuthor.value = "";
             addStatus.checked = false;
         }
-    }
+    };
     
     return isSubmit ? submitBook() : addingBook();
 }
@@ -157,13 +157,13 @@ function enterEditModal(bookId, card, isConfirm) {
         }
 
         inputFeedback(editTitle, editAuthor, dismissModal);
-    }
+    };
 
     const confirmEdit = () => {
         const validTitle = isValidString(editTitle.value);
         const validAuthor = isValidString(editAuthor.value);
         const statusValue = checkStatus(editStatus);
-        const err = document.getElementById('error-confirm')
+        const err = document.getElementById('error-confirm');
 
         if (validTitle && validAuthor) {
             lib[bookId] = [
@@ -178,7 +178,7 @@ function enterEditModal(bookId, card, isConfirm) {
             // display error message (only allows alphabet and numbers for now)
             err.style.display = 'block';
         }
-    }
+    };
     
     return isConfirm ? confirmEdit() : editModal();
 }
@@ -192,7 +192,7 @@ function enterEditModal(bookId, card, isConfirm) {
  */
 function inputFeedback(title, author, modal) {
     var validEntry = document.getElementById('valid-add');
-    var errConfirm = document.getElementById('error-confirm')
+    var errConfirm = document.getElementById('error-confirm');
     var errAdd = document.getElementById('error-add');
     var modals = document.querySelectorAll('.modal');
 
@@ -233,10 +233,8 @@ function inputFeedback(title, author, modal) {
                 author.value = "";
                 stopInputFeedBack();
             }
-        })
-
-        console.log("running interval")
-    }, 400)
+        });
+    }, 400);
 }
 
 /**
@@ -248,7 +246,7 @@ function inputFeedback(title, author, modal) {
 function updateCard(bookId, card) {
     if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
         
-    var bookData = lib[bookId]
+    var bookData = lib[bookId];
 
     for (let i = 0; i < bookData.length; i++) {
         let stringEntry = `{ "update":"${bookData[i]}" }`;
@@ -316,22 +314,22 @@ function stopInputFeedBack() {
 }
 
 window.onload = function() {
-    this.listen();
+    listen();
     if (storageAvailable('localStorage')) {
-        console.log('Yippee! We can use localStorage awesomeness')
+        console.log('Yippee! We can use localStorage awesomeness');
         hasLocal = true;
         if (!localStorage.getItem('lib')) {
             localStorage.setItem('lib', JSON.stringify(lib));
             localStorage.setItem('id', id);
-            this.renderAll(hasLocal);
+            renderAll(hasLocal);
         } else {
-            this.renderAll(hasLocal);
+            renderAll(hasLocal);
         }
     } else {
-        console.log('Too bad, no localStorage for us')
-        this.renderAll(hasLocal);
+        console.log('Too bad, no localStorage for us');
+        renderAll(hasLocal);
     }
-}
+};
 
 // w3school
 function sortTable(n) {
