@@ -174,6 +174,7 @@ function enterEditModal(bookId, card, isConfirm) {
 
             localStorage.setItem('lib', JSON.stringify(lib));
             updateCard(bookId, card);
+            stopInputFeedBack();
         } else {
             // display error message (only allows alphabet and numbers for now)
             err.style.display = 'block';
@@ -191,10 +192,11 @@ function enterEditModal(bookId, card, isConfirm) {
  * @return {void}
  */
 function inputFeedback(title, author, modal) {
-    var validEntry = document.getElementById('valid-add');
-    var errConfirm = document.getElementById('error-confirm');
-    var errAdd = document.getElementById('error-add');
-    var modals = document.querySelectorAll('.modal');
+    const validEntry = document.getElementById('valid-add');
+    const errConfirm = document.getElementById('error-confirm');
+    const errAdd = document.getElementById('error-add');
+    const addModal = document.querySelector('#addBookModal');
+    const editModal = document.querySelector('#editBookModal');
 
     validInputInterval = setInterval(() => {
         if (!isValidString(title.value)) {
@@ -224,16 +226,14 @@ function inputFeedback(title, author, modal) {
         }
 
         // stops interval if modals are closed
-        modals.forEach(modal => {
-            if (modal.style.display == 'none') {
-                validEntry.style.display = 'none';
-                errConfirm.style.display = 'none';
-                errAdd.style.display = 'none';
-                title.value = "";
-                author.value = "";
-                stopInputFeedBack();
-            }
-        });
+        if (addModal.style.display == 'none' && editModal.style.display != 'block') {
+            validEntry.style.display = 'none';
+            errConfirm.style.display = 'none';
+            errAdd.style.display = 'none';
+            stopInputFeedBack();
+        }
+
+        console.log('running')
     }, 400);
 }
 
@@ -246,7 +246,7 @@ function inputFeedback(title, author, modal) {
 function updateCard(bookId, card) {
     if (hasLocal) lib = JSON.parse(localStorage.getItem('lib'));
         
-    var bookData = lib[bookId];
+    const bookData = lib[bookId];
 
     for (let i = 0; i < bookData.length; i++) {
         let stringEntry = `{ "update":"${bookData[i]}" }`;
