@@ -167,7 +167,6 @@ function enterEditModal(bookId, card, isConfirm) {
 
       localStorage.setItem("lib", JSON.stringify(lib));
       updateCard(bookId, card);
-      stopInputFeedBack();
     } else {
       // display error message (only allows alphabet and numbers for now)
       err.style.display = "block";
@@ -219,16 +218,12 @@ function inputFeedback(title, author, modal) {
     }
 
     // stops interval if modals are closed
-    if (
-      addModal.style.display == "none" &&
-      editModal.style.display != "block"
-    ) {
+    if (addModal.style.display == "none" && editModal.style.display == "none") {
       validEntry.style.display = "none";
       errConfirm.style.display = "none";
       errAdd.style.display = "none";
       stopInputFeedBack();
     }
-
     console.log("running");
   }, 400);
 }

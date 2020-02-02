@@ -1,104 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Library</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="banner shadow-sm"><h1>Library App</h1></div>
     <div class="main table-responsive">
-        <table class="table table-hover text-center shadow" id="card-table">
-            <thead class="table-head">
-                <tr class="shadow-sm">
-                    <th><a id="sort-title">Title</a></th>
-                    <th><a id="sort-author">Author</a></th>
-                    <th><a id="sort-status">Status</a></th>
-                    <th>
-                        <button type="button" class="add-button" data-toggle="modal" data-target="#addBookModal">Add Book</button>
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="cards">
-            </tbody>
-        </table>
+      <table class="table table-hover text-center shadow" id="card-table">
+        <thead class="table-head">
+          <tr class="shadow-sm">
+            <th><a id="sort-title">Title</a></th>
+            <th><a id="sort-author">Author</a></th>
+            <th><a id="sort-status">Status</a></th>
+            <th>
+              <button
+                type="button"
+                class="add-button"
+                data-toggle="modal"
+                data-target="#addBookModal"
+              >
+                Add Book
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="cards"></tbody>
+      </table>
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="addBookModal" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Book</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form action="/action_page.php">
-                        <div class="form-group">
-                            <label for="title">Title:</label>
-                            <input type="text" class="form-control" id="title" placeholder="Enter title" name="title" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="author">Author:</label>
-                            <input type="text" class="form-control" id="author" placeholder="Enter author" name="author" required>
-                        </div>
-                        <label>
-                        <input id="status" type="checkbox" name="read"> Read
-                        </label>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <div id="error-add" class="invalid-tooltip">Please input a valid Title or Author.</div>
-                    <div id="valid-add" class="valid-tooltip">Book Successfully Added!</div>
-                    <button id="submit-book" type="button" class="btn btn-default">Submit</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+    <div
+      class="modal fade"
+      id="addBookModal"
+      role="dialog"
+      style="display: none;"
+    >
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Add Book</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="/action_page.php">
+              <div class="form-group">
+                <label for="title">Title:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="title"
+                  placeholder="Enter title"
+                  name="title"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="author">Author:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="author"
+                  placeholder="Enter author"
+                  name="author"
+                  required
+                />
+              </div>
+              <label>
+                <input id="status" type="checkbox" name="read" /> Read
+              </label>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div id="error-add" class="invalid-tooltip">
+              Please input a valid Title or Author.
             </div>
+            <div id="valid-add" class="valid-tooltip">
+              Book Successfully Added!
+            </div>
+            <button id="submit-book" type="button" class="btn btn-default">
+              Submit
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
-    <div class="modal fade" id="editBookModal" role="dialog">
-        <div class="modal-dialog">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Edit Book</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form action="/action_page.php">
-                        <div class="form-group">
-                            <label for="title-edit">Title:</label>
-                            <input type="text"
-                                class="form-control" 
-                                id="title-edit" 
-                                placeholder="Enter title" 
-                                name="title" 
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label for="author-edit">Author:</label>
-                            <input type="text" class="form-control" id="author-edit" placeholder="Enter author" name="author" required>
-                        </div>
-                        <label><input id="status-edit" type="checkbox" name="read"> Read </label>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <div id="error-confirm" class="invalid-tooltip"> Please input a valid Title or Author.</div>
-                    <button id="confirm-edit" type="submit" class="btn btn-default" data-dismiss="modal">Confirm</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+    <div
+      class="modal fade"
+      id="editBookModal"
+      role="dialog"
+      style="display: none;"
+    >
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Edit Book</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+          </div>
+          <div class="modal-body">
+            <form action="/action_page.php">
+              <div class="form-group">
+                <label for="title-edit">Title:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="title-edit"
+                  placeholder="Enter title"
+                  name="title"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="author-edit">Author:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="author-edit"
+                  placeholder="Enter author"
+                  name="author"
+                  required
+                />
+              </div>
+              <label
+                ><input id="status-edit" type="checkbox" name="read" /> Read
+              </label>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <div id="error-confirm" class="invalid-tooltip">
+              Please input a valid Title or Author.
             </div>
+            <button
+              id="confirm-edit"
+              type="submit"
+              class="btn btn-default"
+              data-dismiss="modal"
+            >
+              Confirm
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="./library.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>
