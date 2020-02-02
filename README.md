@@ -6,6 +6,7 @@ A simple library application that helps you keeps track of books you've read or 
 - Sort by title, author, or status  
 - Mobile friendly  
 - Color Scheme inspired by Goodreads  
+- Real-time form validation
 
 ## Utilized  
 - Objects and Object Constructors for organizing code  
