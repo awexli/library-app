@@ -14,7 +14,7 @@ A simple library application that helps you keeps track of books you've read or 
 
 - Objects and Object Constructors for organizing code
 - Bootstrap for tabling, tooltip notifications, and modals
-- Local Storage (Allows users to save data on their computer)
+- Local Storage (First time using Local Storage to allow users to save data on their computer)
 
 ## Future Additions
 
